@@ -31,7 +31,7 @@ export default function Login() {
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl text-white w-[360px] shadow-2xl">
 
         <h2 className="text-3xl font-bold text-center mb-6">
-          LMS Login
+          LMS Login System
         </h2>
 
         <input
