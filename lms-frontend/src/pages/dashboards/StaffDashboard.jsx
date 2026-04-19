@@ -1,143 +1,139 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
+import { Clock, CheckCircle, AlertCircle, Calendar, FileText } from "lucide-react";
 
 export default function StaffDashboard() {
+  const { isDark } = useContext(ThemeContext);
 
-  // 📌 Requests (Library / Admin / Student help)
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Issue Books to Student",
-      assignedTo: "Ali Staff",
-      status: "Pending",
-      priority: "High"
-    },
-    {
-      id: 2,
-      title: "Return Verification",
-      assignedTo: "Sara Staff",
-      status: "In Progress",
-      priority: "Medium"
-    }
+  const [tasks] = useState([
+    { id: 1, title: "Update Library Records", status: "Completed", date: "2026-04-18" },
+    { id: 2, title: "Process Student Applications", status: "In Progress", date: "2026-04-19" },
+    { id: 3, title: "Generate Monthly Report", status: "Pending", date: "2026-04-20" },
+    { id: 4, title: "Data Backup", status: "Completed", date: "2026-04-17" },
   ]);
 
-  const [completed, setCompleted] = useState([]);
+  const [attendance] = useState({
+    present: 18,
+    absent: 2,
+    leave: 1,
+  });
 
-  // ✔ Mark Task Complete
-  const completeTask = (id) => {
-    const task = tasks.find(t => t.id === id);
+  const bgClass = isDark 
+    ? "bg-gradient-to-br from-black via-gray-900 to-purple-900" 
+    : "bg-gradient-to-br from-white via-gray-50 to-blue-50";
+  
+  const cardClass = isDark
+    ? "bg-white/10 border border-white/20"
+    : "bg-white/40 border border-white/60";
 
-    if (task) {
-      setCompleted(prev => [...prev, { ...task, status: "Completed" }]);
-      setTasks(prev => prev.filter(t => t.id !== id));
-    }
-  };
-
-  // ⏳ Update Status
-  const updateStatus = (id, newStatus) => {
-    setTasks(prev =>
-      prev.map(task =>
-        task.id === id ? { ...task, status: newStatus } : task
-      )
-    );
-  };
+  const textClass = isDark ? "text-white" : "text-gray-900";
+  const mutedClass = isDark ? "text-gray-400" : "text-gray-600";
 
   return (
-    <div className="p-6 text-white">
+    <div className={`p-6 min-h-screen ${bgClass}`}>
 
       {/* Header */}
-      <h1 className="text-2xl font-bold mb-6">
-        🧑‍💼 Staff Dashboard
-      </h1>
+      <div className="mb-6">
+        <h1 className={`text-3xl font-bold mb-2 ${textClass}`}>
+          👔 Staff Dashboard
+        </h1>
+        <p className={mutedClass}>Tasks & Daily Operations</p>
+      </div>
 
-      {/* Task Section */}
-      <div className="bg-white/10 backdrop-blur p-4 rounded-xl mb-6">
-
-        <h2 className="text-lg mb-4">Active Tasks</h2>
-
-        {tasks.length === 0 ? (
-          <p className="text-gray-300">No active tasks</p>
-        ) : (
-          <div className="space-y-3">
-
-            {tasks.map(task => (
-              <div
-                key={task.id}
-                className="bg-white/5 p-3 rounded flex justify-between items-center"
-              >
-
-                {/* Info */}
-                <div>
-                  <h3 className="font-semibold">{task.title}</h3>
-                  <p className="text-sm text-gray-300">
-                    Assigned: {task.assignedTo}
-                  </p>
-
-                  <p className="text-xs text-yellow-300">
-                    Priority: {task.priority}
-                  </p>
-
-                  <p className="text-xs text-blue-300">
-                    Status: {task.status}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 flex-wrap">
-
-                  <button
-                    onClick={() => updateStatus(task.id, "In Progress")}
-                    className="bg-blue-500 px-2 py-1 rounded text-xs hover:scale-105"
-                  >
-                    Start
-                  </button>
-
-                  <button
-                    onClick={() => updateStatus(task.id, "Review")}
-                    className="bg-yellow-500 px-2 py-1 rounded text-xs hover:scale-105"
-                  >
-                    Review
-                  </button>
-
-                  <button
-                    onClick={() => completeTask(task.id)}
-                    className="bg-green-500 px-2 py-1 rounded text-xs hover:scale-105"
-                  >
-                    Complete
-                  </button>
-
-                </div>
-
-              </div>
-            ))}
-
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-green-500/30 to-green-700/30" : "bg-gradient-to-br from-green-200/50 to-green-400/50"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>Present Today</p>
+              <p className="text-2xl font-bold">{attendance.present}</p>
+            </div>
+            <CheckCircle size={32} className="opacity-50" />
           </div>
-        )}
+        </div>
+
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-red-500/30 to-red-700/30" : "bg-gradient-to-br from-red-200/50 to-red-400/50"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>Absent</p>
+              <p className="text-2xl font-bold">{attendance.absent}</p>
+            </div>
+            <AlertCircle size={32} className="opacity-50" />
+          </div>
+        </div>
+
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-yellow-500/30 to-yellow-700/30" : "bg-gradient-to-br from-yellow-200/50 to-yellow-400/50"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>On Leave</p>
+              <p className="text-2xl font-bold">{attendance.leave}</p>
+            </div>
+            <Calendar size={32} className="opacity-50" />
+          </div>
+        </div>
+
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-blue-500/30 to-blue-700/30" : "bg-gradient-to-br from-blue-200/50 to-blue-400/50"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>Completed Tasks</p>
+              <p className="text-2xl font-bold">2/4</p>
+            </div>
+            <CheckCircle size={32} className="opacity-50" />
+          </div>
+        </div>
 
       </div>
 
-      {/* Completed Tasks */}
-      <div className="bg-white/10 backdrop-blur p-4 rounded-xl">
+      {/* Tasks */}
+      <div className={`p-5 rounded-xl backdrop-blur ${cardClass}`}>
+        <h2 className={`text-lg font-semibold mb-4 ${textClass}`}>
+          📋 Today's Tasks
+        </h2>
 
-        <h2 className="text-lg mb-4">Completed Tasks</h2>
-
-        {completed.length === 0 ? (
-          <p className="text-gray-300">No completed tasks yet</p>
-        ) : (
-          <div className="space-y-2">
-
-            {completed.map(task => (
-              <div
-                key={task.id}
-                className="bg-green-500/20 p-2 rounded flex justify-between"
-              >
-                <span>{task.title}</span>
-                <span className="text-green-300">Completed ✔</span>
+        <div className="space-y-3">
+          {tasks.map((task) => (
+            <div
+              key={task.id}
+              className={`p-3 rounded-lg flex justify-between items-center ${isDark ? "bg-white/5 hover:bg-white/10" : "bg-black/5 hover:bg-black/10"} transition`}
+            >
+              <div>
+                <p className={`font-medium ${textClass}`}>{task.title}</p>
+                <p className={`text-sm ${mutedClass}`}>{task.date}</p>
               </div>
-            ))}
+              <span className={`px-3 py-1 rounded text-xs font-semibold ${
+                task.status === "Completed"
+                  ? "bg-green-500/20 text-green-400"
+                  : task.status === "In Progress"
+                  ? "bg-blue-500/20 text-blue-400"
+                  : "bg-yellow-500/20 text-yellow-400"
+              }`}>
+                {task.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
-          </div>
-        )}
-
+      {/* Action Buttons */}
+      <div className="mt-6 flex gap-3">
+        <button className={`flex-1 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
+          isDark
+            ? "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+            : "bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white"
+        }`}>
+          <FileText size={18} />
+          Mark Attendance
+        </button>
+        <button className={`flex-1 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
+          isDark
+            ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
+            : "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white"
+        }`}>
+          <CheckCircle size={18} />
+          Update Task Status
+        </button>
       </div>
 
     </div>

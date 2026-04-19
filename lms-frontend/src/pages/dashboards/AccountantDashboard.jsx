@@ -1,215 +1,130 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
+import { DollarSign, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function AccountantDashboard() {
+  const { isDark } = useContext(ThemeContext);
 
-  // 📊 Dummy Users Data
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Ali Khan",
-      fee: 5000,
-      paid: 3000,
-      fine: 200,
-      lastPayment: "2026-04-10"
-    },
-    {
-      id: 2,
-      name: "Sara Ahmed",
-      fee: 4000,
-      paid: 4000,
-      fine: 0,
-      lastPayment: "2026-04-12"
-    }
+  const [transactions] = useState([
+    { id: 1, user: "Ali Khan", amount: 5000, type: "Received", date: "2026-04-18", status: "Completed" },
+    { id: 2, user: "Sara Ahmed", amount: 3500, type: "Received", date: "2026-04-17", status: "Completed" },
+    { id: 3, user: "Fine Payment", amount: 500, type: "Received", date: "2026-04-16", status: "Completed" },
+    { id: 4, user: "Library Expenses", amount: 2000, type: "Paid", date: "2026-04-15", status: "Pending" },
   ]);
 
-  const [history, setHistory] = useState([]);
-
-  // 💰 Pay Fee
-  const handlePay = (id, amount) => {
-    setUsers(prev =>
-      prev.map(user => {
-        if (user.id === id) {
-          const updatedPaid = user.paid + amount;
-
-          setHistory(prevHistory => [
-            ...prevHistory,
-            {
-              name: user.name,
-              amount,
-              date: new Date().toLocaleDateString(),
-              type: "Fee Payment"
-            }
-          ]);
-
-          return {
-            ...user,
-            paid: updatedPaid,
-            lastPayment: new Date().toISOString().split("T")[0]
-          };
-        }
-        return user;
-      })
-    );
+  const stats = {
+    totalReceived: 45000,
+    totalPaid: 12000,
+    pending: 2000,
+    balance: 33000,
   };
 
-  // ⚠️ Add Fine
-  const addFine = (id) => {
-    setUsers(prev =>
-      prev.map(user => {
-        if (user.id === id) {
-          const newFine = user.fine + 100;
+  const bgClass = isDark 
+    ? "bg-gradient-to-br from-black via-gray-900 to-purple-900" 
+    : "bg-gradient-to-br from-white via-gray-50 to-blue-50";
+  
+  const cardClass = isDark
+    ? "bg-white/10 border border-white/20"
+    : "bg-white/40 border border-white/60";
 
-          setHistory(prevHistory => [
-            ...prevHistory,
-            {
-              name: user.name,
-              amount: 100,
-              date: new Date().toLocaleDateString(),
-              type: "Fine Added"
-            }
-          ]);
-
-          return { ...user, fine: newFine };
-        }
-        return user;
-      })
-    );
-  };
-
-  // 💵 Pay Fine
-  const payFine = (id) => {
-    setUsers(prev =>
-      prev.map(user => {
-        if (user.id === id && user.fine > 0) {
-
-          setHistory(prevHistory => [
-            ...prevHistory,
-            {
-              name: user.name,
-              amount: user.fine,
-              date: new Date().toLocaleDateString(),
-              type: "Fine Paid"
-            }
-          ]);
-
-          return { ...user, fine: 0 };
-        }
-        return user;
-      })
-    );
-  };
+  const textClass = isDark ? "text-white" : "text-gray-900";
+  const mutedClass = isDark ? "text-gray-100" : "text-gray-900";
 
   return (
-    <div className="p-6 text-white">
+    <div className={`p-6 min-h-screen ${bgClass}`}>
 
       {/* Header */}
-      <h1 className="text-2xl font-bold mb-6">
-        💰 Accountant Dashboard
-      </h1>
-
-      {/* Users Table */}
-      <div className="bg-white/10 backdrop-blur p-4 rounded-xl mb-6">
-
-        <h2 className="mb-4 text-lg">Student Payments</h2>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-
-            <thead>
-              <tr className="border-b border-white/20 text-left">
-                <th className="p-2">Name</th>
-                <th>Total Fee</th>
-                <th>Paid</th>
-                <th>Remaining</th>
-                <th>Fine</th>
-                <th>Last Payment</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {users.map(user => {
-                const remaining = user.fee - user.paid;
-
-                return (
-                  <tr key={user.id} className="border-b border-white/10">
-
-                    <td className="p-2">{user.name}</td>
-                    <td>{user.fee}</td>
-
-                    <td className="text-green-400">
-                      {user.paid}
-                    </td>
-
-                    <td className="text-yellow-400">
-                      {remaining}
-                    </td>
-
-                    <td className="text-red-400">
-                      {user.fine}
-                    </td>
-
-                    <td>{user.lastPayment}</td>
-
-                    <td className="flex gap-2 flex-wrap">
-
-                      <button
-                        onClick={() => handlePay(user.id, 500)}
-                        className="bg-green-500 px-2 py-1 rounded text-xs hover:scale-105"
-                      >
-                        Pay 500
-                      </button>
-
-                      <button
-                        onClick={() => addFine(user.id)}
-                        className="bg-yellow-500 px-2 py-1 rounded text-xs hover:scale-105"
-                      >
-                        + Fine
-                      </button>
-
-                      {user.fine > 0 && (
-                        <button
-                          onClick={() => payFine(user.id)}
-                          className="bg-red-500 px-2 py-1 rounded text-xs hover:scale-105"
-                        >
-                          Pay Fine
-                        </button>
-                      )}
-
-                    </td>
-
-                  </tr>
-                );
-              })}
-            </tbody>
-
-          </table>
-        </div>
+      <div className="mb-6">
+        <h1 className={`text-3xl font-bold mb-2 ${textClass}`}>
+          💰 Accountant Dashboard
+        </h1>
+        <p className={mutedClass}>Financial Management & Transactions</p>
       </div>
 
-      {/* 📜 Transaction History */}
-      <div className="bg-white/10 backdrop-blur p-4 rounded-xl">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-green-500 to-green-700" : "bg-gradient-to-br from-green-200 to-green-400"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>Total Received</p>
+              <p className="text-2xl font-bold">Rs {stats.totalReceived}</p>
+            </div>
+            <TrendingUp size={32} className="opacity-50" />
+          </div>
+        </div>
 
-        <h2 className="mb-4 text-lg">Transaction History</h2>
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-red-500 to-red-700" : "bg-gradient-to-br from-red-200 to-red-400"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>Total Paid</p>
+              <p className="text-2xl font-bold">Rs {stats.totalPaid}</p>
+            </div>
+            <DollarSign size={32} className="opacity-50" />
+          </div>
+        </div>
 
-        {history.length === 0 ? (
-          <p className="text-gray-300">No transactions yet</p>
-        ) : (
-          <ul className="space-y-2 text-sm">
-            {history.map((h, i) => (
-              <li
-                key={i}
-                className="bg-white/5 p-2 rounded flex justify-between"
-              >
-                <span>{h.name}</span>
-                <span>{h.type}</span>
-                <span>{h.amount}</span>
-                <span>{h.date}</span>
-              </li>
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-yellow-500 to-yellow-700" : "bg-gradient-to-br from-yellow-300 to-yellow-400"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>Pending</p>
+              <p className="text-2xl font-bold">Rs {stats.pending}</p>
+            </div>
+            <AlertCircle size={32} className="opacity-50" />
+          </div>
+        </div>
+
+        <div className={`p-4 rounded-xl ${isDark ? "bg-gradient-to-br from-blue-500 to-blue-700" : "bg-gradient-to-br from-blue-200 to-blue-400"} backdrop-blur`}>
+          <div className={`flex items-center justify-between ${textClass}`}>
+            <div>
+              <p className={`text-sm ${mutedClass}`}>Balance</p>
+              <p className="text-2xl font-bold">Rs {stats.balance}</p>
+            </div>
+            <CheckCircle size={32} className="opacity-50" />
+          </div>
+        </div>
+
+      </div>
+
+      {/* Transactions Table */}
+      <div className={`p-5 rounded-xl backdrop-blur ${cardClass} overflow-auto`}>
+        <h2 className={`text-lg font-semibold mb-4 ${textClass}`}>
+          💳 Recent Transactions
+        </h2>
+
+        <table className="w-full text-sm">
+          <thead className={`${isDark ? "border-white/20" : "border-gray-300"} border-b`}>
+            <tr>
+              <th className={`text-left p-3 ${mutedClass}`}>Description</th>
+              <th className={`text-left p-3 ${mutedClass}`}>Amount</th>
+              <th className={`text-left p-3 ${mutedClass}`}>Type</th>
+              <th className={`text-left p-3 ${mutedClass}`}>Date</th>
+              <th className={`text-left p-3 ${mutedClass}`}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((txn) => (
+              <tr key={txn.id} className={`${isDark ? "border-white/10 hover:bg-white/5" : "border-gray-200 hover:bg-black/5"} border-b transition`}>
+                <td className={`p-3 ${textClass}`}>{txn.user}</td>
+                <td className={`p-3 ${textClass} font-semibold`}>Rs {txn.amount}</td>
+                <td className={`p-3 ${txn.type === "Received" ? "text-green-400" : "text-red-400"}`}>
+                  {txn.type}
+                </td>
+                <td className={`p-3 ${mutedClass}`}>{txn.date}</td>
+                <td className="p-3">
+                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                    txn.status === "Completed"
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-yellow-500/20 text-yellow-400"
+                  }`}>
+                    {txn.status}
+                  </span>
+                </td>
+              </tr>
             ))}
-          </ul>
-        )}
-
+          </tbody>
+        </table>
       </div>
 
     </div>

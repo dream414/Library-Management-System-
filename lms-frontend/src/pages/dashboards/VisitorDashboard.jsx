@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
+import { BookOpen, Users, Award, Send } from "lucide-react";
 
 export default function VisitorDashboard() {
+  const { isDark } = useContext(ThemeContext);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -22,70 +27,87 @@ export default function VisitorDashboard() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Request submitted successfully 🚀");
+    alert("Request submitted successfully!");
     setForm({ name: "", email: "", interest: "" });
   };
 
-  return (
-    <div className="min-h-screen p-6 text-white bg-gradient-to-br from-black via-gray-900 to-blue-900">
+  const bgClass = isDark 
+    ? "bg-gradient-to-br from-black via-gray-900 to-purple-900" 
+    : "bg-gradient-to-br from-white via-gray-50 to-blue-50";
+  
+  const cardClass = isDark
+    ? "bg-white/10 border border-white/20"
+    : "bg-white/40 border border-white/60";
 
-      {/* HEADER */}
-      <h1 className="text-3xl font-bold mb-2">
+  const textClass = isDark ? "text-white" : "text-gray-900";
+  const mutedClass = isDark ? "text-gray-400" : "text-gray-600";
+
+  return (
+    <div className={`min-h-screen p-6 ${bgClass}`}>
+
+      {/* Header */}
+      <h1 className={`text-3xl font-bold mb-2 ${textClass}`}>
         👋 Welcome Visitor
       </h1>
 
-      <p className="text-gray-300 mb-6">
+      <p className={`${mutedClass} mb-6`}>
         Explore our LMS system before registering
       </p>
 
-      {/* TOP CARDS */}
+      {/* Top Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
-        <div className="bg-white/10 p-4 rounded-xl backdrop-blur">
-          🎓 Total Courses <br />
-          <span className="text-2xl font-bold">12+</span>
+        <div className={`p-4 rounded-xl backdrop-blur ${cardClass}`}>
+          <div className={textClass}>
+            🎓 Total Courses <br />
+            <span className="text-2xl font-bold">12+</span>
+          </div>
         </div>
 
-        <div className="bg-white/10 p-4 rounded-xl backdrop-blur">
-          👨‍🏫 Expert Teachers <br />
-          <span className="text-2xl font-bold">20+</span>
+        <div className={`p-4 rounded-xl backdrop-blur ${cardClass}`}>
+          <div className={textClass}>
+            👨‍🏫 Expert Teachers <br />
+            <span className="text-2xl font-bold">20+</span>
+          </div>
         </div>
 
-        <div className="bg-white/10 p-4 rounded-xl backdrop-blur">
-          🧑‍🎓 Students Enrolled <br />
-          <span className="text-2xl font-bold">1000+</span>
+        <div className={`p-4 rounded-xl backdrop-blur ${cardClass}`}>
+          <div className={textClass}>
+            🧑‍🎓 Students Enrolled <br />
+            <span className="text-2xl font-bold">1000+</span>
+          </div>
         </div>
 
       </div>
 
-      {/* COURSES SECTION */}
-      <div className="bg-white/10 p-5 rounded-xl backdrop-blur mb-6">
-        <h2 className="text-xl mb-4">📚 Popular Courses</h2>
+      {/* Courses Section */}
+      <div className={`p-5 rounded-xl backdrop-blur ${cardClass} mb-6`}>
+        <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>📚 Popular Courses</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {courses.map((c) => (
-            <div key={c.id} className="p-3 bg-white/10 rounded-lg">
-              <h3 className="font-bold">{c.name}</h3>
-              <p className="text-sm text-gray-300">{c.level}</p>
+            <div key={c.id} className={`p-3 rounded-lg ${isDark ? "bg-white/5 hover:bg-white/10" : "bg-black/5 hover:bg-black/10"} transition`}>
+              <h3 className={`font-bold ${textClass}`}>{c.name}</h3>
+              <p className={`text-sm ${mutedClass}`}>{c.level}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ANNOUNCEMENTS */}
-      <div className="bg-white/10 p-5 rounded-xl backdrop-blur mb-6">
-        <h2 className="text-xl mb-4">📢 Announcements</h2>
+      {/* Announcements */}
+      <div className={`p-5 rounded-xl backdrop-blur ${cardClass} mb-6`}>
+        <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>📢 Announcements</h2>
 
-        <ul className="space-y-2 text-gray-300">
+        <ul className={`space-y-2 ${mutedClass}`}>
           {announcements.map((a, i) => (
             <li key={i}>{a}</li>
           ))}
         </ul>
       </div>
 
-      {/* REGISTRATION FORM */}
-      <div className="bg-white/10 p-5 rounded-xl backdrop-blur">
-        <h2 className="text-xl mb-4">📝 Request Registration</h2>
+      {/* Registration Form */}
+      <div className={`p-5 rounded-xl backdrop-blur ${cardClass}`}>
+        <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>📝 Request Registration</h2>
 
         <form onSubmit={handleSubmit} className="space-y-3">
 
@@ -94,7 +116,11 @@ export default function VisitorDashboard() {
             placeholder="Your Name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full p-2 rounded bg-black/30"
+            className={`w-full p-2 rounded ${
+              isDark 
+                ? "bg-black/30 text-white placeholder-gray-400 border border-white/10" 
+                : "bg-white/30 text-gray-900 placeholder-gray-600 border border-white/50"
+            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
 
           <input
@@ -102,13 +128,21 @@ export default function VisitorDashboard() {
             placeholder="Your Email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full p-2 rounded bg-black/30"
+            className={`w-full p-2 rounded ${
+              isDark 
+                ? "bg-black/30 text-white placeholder-gray-400 border border-white/10" 
+                : "bg-white/30 text-gray-900 placeholder-gray-600 border border-white/50"
+            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
 
           <select
             value={form.interest}
             onChange={(e) => setForm({ ...form, interest: e.target.value })}
-            className="w-full p-2 rounded bg-black/30"
+            className={`w-full p-2 rounded ${
+              isDark 
+                ? "bg-black/30 text-white border border-white/10" 
+                : "bg-white/30 text-gray-900 border border-white/50"
+            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
           >
             <option>Computer Science</option>
             <option>Web Development</option>
@@ -118,8 +152,13 @@ export default function VisitorDashboard() {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 py-2 rounded hover:bg-blue-600 transition"
+            className={`w-full py-2 rounded font-semibold transition flex items-center justify-center gap-2 ${
+              isDark
+                ? "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                : "bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white"
+            }`}
           >
+            <Send size={18} />
             Submit Request
           </button>
 

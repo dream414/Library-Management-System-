@@ -13,8 +13,8 @@ export default function Login() {
     const result = login(email, password);
 
     if (result.success) {
-      // role-based routing
-      navigate(`/dashboard/${result.role}`);
+      // ✅ یہاں ٹھیک کیا - /dashboard/ ہٹا دیا
+      navigate(`/${result.role}`);
     } else {
       alert("Invalid email or password");
     }
